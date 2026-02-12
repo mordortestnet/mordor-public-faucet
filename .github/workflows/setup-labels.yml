@@ -1,0 +1,99 @@
+name: Setup - Initialize Repository Labels
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force update existing labels'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  setup-labels:
+    name: Create Repository Labels
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create/Update Labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: 'bug', color: 'd73a4a', description: 'Something isn\'t working' },
+              { name: 'documentation', color: '0075ca', description: 'Documentation improvements' },
+              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' },
+              { name: 'good first issue', color: '7057ff', description: 'Good for newcomers' },
+              { name: 'help wanted', color: '008672', description: 'Extra attention needed' },
+              { name: 'security', color: 'ee0701', description: 'Security-related issues' },
+              { name: 'workflows', color: 'fbca04', description: 'GitHub Actions workflow changes' },
+              { name: 'catacomb', color: 'bfdadc', description: 'Related to Catacomb multisig' },
+              { name: 'dependencies', color: '0366d6', description: 'Dependency updates' },
+              { name: 'github-actions', color: '000000', description: 'GitHub Actions updates' },
+              { name: 'question', color: 'd876e3', description: 'Further information is requested' },
+              { name: 'wontfix', color: 'ffffff', description: 'This will not be worked on' },
+              { name: 'duplicate', color: 'cfd3d7', description: 'This issue or pull request already exists' },
+              { name: 'invalid', color: 'e4e669', description: 'This doesn\'t seem right' },
+            ];
+            
+            const forceUpdate = '${{ github.event.inputs.force_update }}' === 'true';
+            
+            console.log(`Setting up labels (force update: ${forceUpdate})...`);
+            
+            for (const label of labels) {
+              try {
+                // Try to get existing label
+                const existingLabel = await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                }).catch(() => null);
+                
+                if (existingLabel) {
+                  if (forceUpdate) {
+                    // Update existing label
+                    await github.rest.issues.updateLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description,
+                    });
+                    console.log(`✅ Updated label: ${label.name}`);
+                  } else {
+                    console.log(`⏭️  Skipped existing label: ${label.name} (use force_update to update)`);
+                  }
+                } else {
+                  // Create new label
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description,
+                  });
+                  console.log(`✅ Created label: ${label.name}`);
+                }
+              } catch (error) {
+                console.error(`❌ Failed to process label ${label.name}: ${error.message}`);
+              }
+            }
+            
+            console.log('\n✅ Label setup complete!');
+
+      - name: Summary
+        run: |
+          echo "## Label Setup Complete! 🏷️" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Labels have been created/updated in this repository." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "You can view all labels at:" >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ github.repository }}/labels" >> $GITHUB_STEP_SUMMARY

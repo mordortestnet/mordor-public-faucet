@@ -1,0 +1,28 @@
+[default]
+extend-ignore-re = [
+  # Ignore blockchain addresses
+  "0x[a-fA-F0-9]{40}",
+  # Ignore transaction hashes
+  "0x[a-fA-F0-9]{64}",
+]
+
+[default.extend-words]
+# Add custom dictionary words
+WETC = "WETC"
+ETC = "ETC"
+Mordor = "Mordor"
+testnet = "testnet"
+blockchain = "blockchain"
+ethers = "ethers"
+WETH9 = "WETH9"
+Blockscout = "Blockscout"
+catacomb = "catacomb"
+multisig = "multisig"
+
+[files]
+extend-exclude = [
+  "node_modules/",
+  "*.lock",
+  "package-lock.json",
+  ".git/",
+]

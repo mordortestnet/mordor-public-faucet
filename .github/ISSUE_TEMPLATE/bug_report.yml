@@ -1,0 +1,101 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with the workflows
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below.
+
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Which workflow is affected?
+      description: Select the workflow experiencing the issue
+      options:
+        - Wrap ETC to WETC
+        - Unwrap WETC to ETC
+        - Token Distribution (PR-based)
+        - ETC Distribution (PR-based)
+        - Catacomb Safe Distribution
+        - Other/Multiple
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the bug
+      placeholder: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Go to Actions tab
+        2. Run workflow with inputs...
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: The workflow should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Instead, the workflow...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Workflow Logs
+      description: Please paste relevant workflow logs
+      render: shell
+      placeholder: Paste error messages or relevant logs here
+
+  - type: input
+    id: run-id
+    attributes:
+      label: Workflow Run ID or URL
+      description: Link to the failed workflow run (if available)
+      placeholder: https://github.com/owner/repo/actions/runs/123456
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information that might help
+      placeholder: |
+        - Wallet balance at the time
+        - Transaction hash (if applicable)
+        - Network conditions
+        - etc.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for similar issues
+          required: true
+        - label: I have reviewed the documentation
+          required: true
+        - label: I am using a testnet wallet (not mainnet)
+          required: false

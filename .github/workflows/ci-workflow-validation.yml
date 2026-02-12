@@ -1,0 +1,109 @@
+name: CI - Workflow Validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'catacomb/.github/workflows/**'
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '.github/workflows/**'
+      - 'catacomb/.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-workflows:
+    name: Validate GitHub Actions Workflows
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install yaml-lint
+        run: npm install -g yaml-lint
+
+      - name: Lint workflow files
+        run: |
+          echo "Validating workflow YAML files..."
+          for file in .github/workflows/*.yml .github/workflows/*.yaml catacomb/.github/workflows/*.yml catacomb/.github/workflows/*.yaml; do
+            if [ -f "$file" ]; then
+              echo "Checking $file"
+              yamllint "$file" || exit 1
+            fi
+          done
+
+      - name: Check for workflow syntax
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const path = require('path');
+            
+            const workflowDirs = [
+              '.github/workflows',
+              'catacomb/.github/workflows'
+            ];
+            
+            let hasErrors = false;
+            
+            for (const dir of workflowDirs) {
+              if (!fs.existsSync(dir)) continue;
+              
+              const files = fs.readdirSync(dir)
+                .filter(f => f.endsWith('.yml') || f.endsWith('.yaml'));
+              
+              for (const file of files) {
+                const filePath = path.join(dir, file);
+                console.log(`Validating ${filePath}...`);
+                
+                try {
+                  const content = fs.readFileSync(filePath, 'utf8');
+                  const workflow = yaml.load(content);
+                  
+                  // Basic validation checks
+                  if (!workflow.name) {
+                    console.error(`❌ ${filePath}: Missing 'name' field`);
+                    hasErrors = true;
+                  }
+                  
+                  if (!workflow.on) {
+                    console.error(`❌ ${filePath}: Missing 'on' trigger field`);
+                    hasErrors = true;
+                  }
+                  
+                  if (!workflow.jobs || Object.keys(workflow.jobs).length === 0) {
+                    console.error(`❌ ${filePath}: Missing or empty 'jobs' field`);
+                    hasErrors = true;
+                  }
+                  
+                  console.log(`✅ ${filePath}: Valid workflow structure`);
+                } catch (error) {
+                  console.error(`❌ ${filePath}: ${error.message}`);
+                  hasErrors = true;
+                }
+              }
+            }
+            
+            if (hasErrors) {
+              core.setFailed('One or more workflow files have validation errors');
+            } else {
+              console.log('✅ All workflow files are valid!');
+            }
+
+      - name: Summary
+        run: |
+          echo "✅ Workflow validation completed successfully"
+          echo "All GitHub Actions workflow files are properly formatted"

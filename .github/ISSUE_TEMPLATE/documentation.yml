@@ -1,0 +1,78 @@
+name: 📚 Documentation Issue
+description: Report an issue with documentation
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation!
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: Which documentation needs improvement?
+      options:
+        - README.md
+        - QUICKSTART.md
+        - PR_DISTRIBUTION_GUIDE.md
+        - CONTRIBUTING.md
+        - SECURITY.md
+        - Catacomb Documentation
+        - Workflow Comments
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Unclear/Confusing
+        - Incorrect Information
+        - Missing Information
+        - Broken Link
+        - Typo/Grammar
+        - Outdated
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Where is the issue in the documentation?
+      placeholder: |
+        - File: README.md
+        - Section: "Setup Instructions"
+        - Line: 42
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's Wrong?
+      description: Describe the documentation issue
+      placeholder: The current documentation says... but it should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How should we improve this?
+      placeholder: Instead, it should say...
+
+  - type: checkboxes
+    id: volunteer
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to submit a PR to fix this
+          required: false

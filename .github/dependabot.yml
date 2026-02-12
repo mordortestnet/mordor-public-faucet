@@ -1,0 +1,36 @@
+version: 2
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "mordortestnet/maintainers"
+    assignees:
+      - "mordortestnet/maintainers"
+
+  # GitHub Actions in catacomb directory
+  - package-ecosystem: "github-actions"
+    directory: "/catacomb"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "catacomb"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

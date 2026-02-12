@@ -1,0 +1,91 @@
+name: CI - Documentation Validation
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+      - 'catacomb/**.md'
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '**.md'
+      - 'catacomb/**.md'
+  workflow_dispatch:
+
+jobs:
+  markdown-lint:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Create markdownlint config
+        run: |
+          cat > .markdownlint.json << 'EOF'
+          {
+            "default": true,
+            "MD013": false,
+            "MD033": false,
+            "MD041": false,
+            "MD034": false
+          }
+          EOF
+
+      - name: Lint markdown files
+        run: |
+          markdownlint '**/*.md' --ignore node_modules --config .markdownlint.json || true
+
+  check-links:
+    name: Check Markdown Links
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdown-link-check
+        run: npm install -g markdown-link-check
+
+      - name: Check links in README
+        run: |
+          markdown-link-check README.md --config .github/markdown-link-check-config.json || true
+        continue-on-error: true
+
+      - name: Check links in all markdown files
+        run: |
+          find . -name "*.md" -not -path "*/node_modules/*" | while read file; do
+            echo "Checking links in $file"
+            markdown-link-check "$file" --config .github/markdown-link-check-config.json || true
+          done
+        continue-on-error: true
+
+  spell-check:
+    name: Spell Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Spell check with typos
+        uses: crate-ci/typos@master
+        with:
+          config: ./.typos.toml
+        continue-on-error: true

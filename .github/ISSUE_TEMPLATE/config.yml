@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/mordortestnet/mordor-public-faucet/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🔒 Security Issue
+    url: https://github.com/mordortestnet/mordor-public-faucet/security/advisories/new
+    about: Report a security vulnerability (private)
+  - name: 🌐 Ethereum Classic Mordor Testnet
+    url: https://github.com/etclabscore/mordor
+    about: Learn more about the ETC Mordor testnet

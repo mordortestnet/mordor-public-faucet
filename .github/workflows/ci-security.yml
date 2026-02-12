@@ -1,0 +1,107 @@
+name: CI - Security Scanning
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  schedule:
+    # Run weekly on Monday at 9am UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  action-security:
+    name: GitHub Actions Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for secrets in code
+        run: |
+          echo "Checking for potential secrets in code..."
+          
+          # Check for potential private keys
+          if grep -r "PRIVATE_KEY" --include="*.js" --include="*.ts" --include="*.json" .; then
+            echo "⚠️  Warning: Found PRIVATE_KEY references in code files"
+            echo "Please ensure these are using environment variables and not hardcoded"
+          fi
+          
+          # Check for potential API keys
+          if grep -r -E "['\"]sk-[a-zA-Z0-9]{32,}['\"]" --include="*.js" --include="*.ts" .; then
+            echo "❌ Error: Potential API key found in code"
+            exit 1
+          fi
+          
+          echo "✅ No obvious secrets found in code"
+
+      - name: Check workflow permissions
+        run: |
+          echo "Checking GitHub Actions workflow permissions..."
+          for file in .github/workflows/*.yml catacomb/.github/workflows/*.yml; do
+            if [ -f "$file" ]; then
+              echo "Checking $file"
+              # Check if workflow has appropriate permissions
+              if grep -q "permissions:" "$file"; then
+                echo "  ✅ Has permissions defined"
+              else
+                echo "  ⚠️  No permissions defined (using default)"
+              fi
+            fi
+          done
+
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for vulnerable packages
+        run: |
+          echo "This project dynamically installs dependencies in workflows."
+          echo "Main dependency: ethers@6"
+          echo ""
+          echo "Checking ethers.js for known vulnerabilities..."
+          
+          # Create a temporary package.json for audit
+          cat > package.json << 'EOF'
+          {
+            "name": "mordor-faucet-security-check",
+            "version": "1.0.0",
+            "dependencies": {
+              "ethers": "^6.0.0"
+            }
+          }
+          EOF
+          
+          npm install --package-lock-only
+          npm audit --audit-level=moderate || echo "⚠️  Some vulnerabilities found, please review"
+          
+          # Cleanup
+          rm -f package.json package-lock.json
+
+  secret-scanning:
+    name: Secret Scanning (Gitleaks)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        continue-on-error: true

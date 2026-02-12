@@ -1,15 +1,28 @@
 # Ethereum Classic Mordor Testnet - Automated Workflows
 
+[![CI - Workflow Validation](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-workflow-validation.yml/badge.svg)](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-workflow-validation.yml)
+[![CI - Documentation](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-docs-validation.yml/badge.svg)](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-docs-validation.yml)
+[![CI - Security](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-security.yml/badge.svg)](https://github.com/mordortestnet/mordor-public-faucet/actions/workflows/ci-security.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 This repository contains GitHub Actions workflows for the Ethereum Classic Mordor testnet, including:
 - 🔄 Wrap/Unwrap ETC ↔ WETC tokens
 - 🎁 PR-based token distribution system (faucet)
 
 ## 📚 Documentation
 
+### Quick Start
+- **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup for wrap/unwrap workflows
+- **[Environment Variables](ENVIRONMENT.md)** - Required secrets and configuration
+
+### User Guides
 - **[PR Distribution Guide](PR_DISTRIBUTION_GUIDE.md)** - Complete guide for PR-based token distribution
 - **[PR Quick Reference](PR_QUICK_REFERENCE.md)** - Quick reference card for maintainers and users
-- **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup for wrap/unwrap workflows
 - **[Setup Commands](SETUP_COMMANDS.md)** - Git and CLI commands reference
+
+### Contributing
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to this project
+- **[Security Policy](SECURITY.md)** - Security guidelines and reporting
 
 ## 🎯 Choose Your Use Case
 
